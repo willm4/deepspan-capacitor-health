@@ -1,7 +1,7 @@
 {
-  "name": "@johnjasonhudson/capacitor-healthkit",
-  "version": "1.3.0",
-  "description": "Custom Capacitor HealthKit plugin with appleWalkingSteadiness support",
+  "name": "@deepspan/capacitor-health",
+  "version": "1.0.0",
+  "description": "DeepSpan Custom Capacitor HealthKit plugin",
   "main": "dist/plugin.cjs.js",
   "module": "dist/esm/index.js",
   "types": "dist/esm/index.d.ts",
@@ -9,26 +9,25 @@
   "files": [
     "dist/",
     "ios/Plugin/",
-    "JohnjasonhudsonCapacitorHealthkit.podspec"
+    "DeepspanCapacitorHealth.podspec"
   ],
-  "author": "John Hudson",
+  "author": "WillM4",
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/johnjasonhudson/capacitor-healthkit.git"
+    "url": "git+https://github.com/willm4/deepspan-capacitor-health.git"
   },
   "bugs": {
-    "url": "https://github.com/johnjasonhudson/capacitor-healthkit/issues"
+    "url": "https://github.com/willm4/deepspan-capacitor-health/issues"
   },
   "keywords": [
     "capacitor",
     "plugin",
     "native",
     "apple",
-    "healthkit"
-  ],
+    "healthkit"  ],
   "scripts": {
-    "verify": "npm run verify:ios && npm run && npm run verify:web",
+    "verify": "npm run verify:ios && npm run verify:web",
     "verify:ios": "cd ios && pod install && xcodebuild -workspace Plugin.xcworkspace -scheme Plugin && cd ..",
     "verify:web": "npm run build",
     "lint": "npm run eslint && npm run prettier -- --check && npm run swiftlint -- lint",
