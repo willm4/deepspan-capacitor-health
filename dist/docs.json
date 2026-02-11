@@ -1,0 +1,262 @@
+{
+  "api": {
+    "name": "CapacitorHealthkitPlugin",
+    "slug": "capacitorhealthkitplugin",
+    "docs": "",
+    "tags": [],
+    "methods": [
+      {
+        "name": "requestAuthorization",
+        "signature": "(authOptions: AuthorizationQueryOptions) => Promise<void>",
+        "parameters": [
+          {
+            "name": "authOptions",
+            "docs": "These define which access we need. Possible Options include ['calories', 'stairs', 'activity', 'steps', 'distance', 'duration', 'weight'].",
+            "type": "AuthorizationQueryOptions"
+          }
+        ],
+        "returns": "Promise<void>",
+        "tags": [
+          {
+            "name": "param",
+            "text": "authOptions These define which access we need. Possible Options include ['calories', 'stairs', 'activity', 'steps', 'distance', 'duration', 'weight']."
+          }
+        ],
+        "docs": "This functions will open the iOS Screen to let users choose their permissions. Keep in mind as developers, if the access has been denied by the user we will have no way of knowing - the query results will instead just be empty arrays.",
+        "complexTypes": [
+          "AuthorizationQueryOptions"
+        ],
+        "slug": "requestauthorization"
+      },
+      {
+        "name": "queryHKitSampleType",
+        "signature": "<T>(queryOptions: SingleQueryOptions) => Promise<QueryOutput<T>>",
+        "parameters": [
+          {
+            "name": "queryOptions",
+            "docs": "defines the type of data and the timeframe which shall be queried, a limit can be set to reduce the number of results.",
+            "type": "SingleQueryOptions"
+          }
+        ],
+        "returns": "Promise<QueryOutput<T>>",
+        "tags": [
+          {
+            "name": "param",
+            "text": "queryOptions defines the type of data and the timeframe which shall be queried, a limit can be set to reduce the number of results."
+          }
+        ],
+        "docs": "This defines a query to the Healthkit for a single type of data.",
+        "complexTypes": [
+          "QueryOutput",
+          "T",
+          "SingleQueryOptions"
+        ],
+        "slug": "queryhkitsampletype"
+      },
+      {
+        "name": "isAvailable",
+        "signature": "() => Promise<void>",
+        "parameters": [],
+        "returns": "Promise<void>",
+        "tags": [],
+        "docs": "This functions resolves if HealthKitData is available it uses the native HKHealthStore.isHealthDataAvailable() funtion of the HealthKit .",
+        "complexTypes": [],
+        "slug": "isavailable"
+      },
+      {
+        "name": "multipleQueryHKitSampleType",
+        "signature": "(queryOptions: MultipleQueryOptions) => Promise<any>",
+        "parameters": [
+          {
+            "name": "queryOptions",
+            "docs": "defines the sample types which can be queried for",
+            "type": "MultipleQueryOptions"
+          }
+        ],
+        "returns": "Promise<any>",
+        "tags": [
+          {
+            "name": "param",
+            "text": "queryOptions defines the sample types which can be queried for"
+          }
+        ],
+        "docs": "This defines a query to the Healthkit for a single type of data. This function has not been tested.",
+        "complexTypes": [
+          "MultipleQueryOptions"
+        ],
+        "slug": "multiplequeryhkitsampletype"
+      },
+      {
+        "name": "isEditionAuthorized",
+        "signature": "(queryOptions: EditionQuery) => Promise<void>",
+        "parameters": [
+          {
+            "name": "queryOptions",
+            "docs": "defines the sampletype for which you need to check for writing permission.",
+            "type": "EditionQuery"
+          }
+        ],
+        "returns": "Promise<void>",
+        "tags": [
+          {
+            "name": "param",
+            "text": "queryOptions defines the sampletype for which you need to check for writing permission."
+          }
+        ],
+        "docs": "Checks if there is writing permission for one specific sample type. This function has not been tested.",
+        "complexTypes": [
+          "EditionQuery"
+        ],
+        "slug": "iseditionauthorized"
+      },
+      {
+        "name": "multipleIsEditionAuthorized",
+        "signature": "(queryOptions: MultipleEditionQuery) => Promise<void>",
+        "parameters": [
+          {
+            "name": "queryOptions",
+            "docs": "defines the sampletypes for which you need to check for writing permission.",
+            "type": "MultipleEditionQuery"
+          }
+        ],
+        "returns": "Promise<void>",
+        "tags": [
+          {
+            "name": "param",
+            "text": "queryOptions defines the sampletypes for which you need to check for writing permission."
+          }
+        ],
+        "docs": "Checks if there is writing permission for multiple sample types. This function has not been tested.",
+        "complexTypes": [
+          "MultipleEditionQuery"
+        ],
+        "slug": "multipleiseditionauthorized"
+      }
+    ],
+    "properties": []
+  },
+  "interfaces": [
+    {
+      "name": "AuthorizationQueryOptions",
+      "slug": "authorizationqueryoptions",
+      "docs": "Used for authorization of reading and writing access.",
+      "tags": [],
+      "methods": [],
+      "properties": [
+        {
+          "name": "read",
+          "tags": [],
+          "docs": "",
+          "complexTypes": [],
+          "type": "string[]"
+        },
+        {
+          "name": "write",
+          "tags": [],
+          "docs": "",
+          "complexTypes": [],
+          "type": "string[]"
+        },
+        {
+          "name": "all",
+          "tags": [],
+          "docs": "",
+          "complexTypes": [],
+          "type": "string[]"
+        }
+      ]
+    },
+    {
+      "name": "QueryOutput",
+      "slug": "queryoutput",
+      "docs": "This interface is used for any results coming from HealthKit. It always has a count and the actual results.",
+      "tags": [],
+      "methods": [],
+      "properties": [
+        {
+          "name": "countReturn",
+          "tags": [],
+          "docs": "",
+          "complexTypes": [],
+          "type": "number"
+        },
+        {
+          "name": "resultData",
+          "tags": [],
+          "docs": "",
+          "complexTypes": [
+            "T"
+          ],
+          "type": "T[]"
+        }
+      ]
+    },
+    {
+      "name": "SingleQueryOptions",
+      "slug": "singlequeryoptions",
+      "docs": "This extends the Basequeryoptions for a single sample type.",
+      "tags": [],
+      "methods": [],
+      "properties": [
+        {
+          "name": "sampleName",
+          "tags": [],
+          "docs": "",
+          "complexTypes": [],
+          "type": "string"
+        }
+      ]
+    },
+    {
+      "name": "MultipleQueryOptions",
+      "slug": "multiplequeryoptions",
+      "docs": "This extends the Basequeryoptions for a multiple sample types.",
+      "tags": [],
+      "methods": [],
+      "properties": [
+        {
+          "name": "sampleNames",
+          "tags": [],
+          "docs": "",
+          "complexTypes": [],
+          "type": "string[]"
+        }
+      ]
+    },
+    {
+      "name": "EditionQuery",
+      "slug": "editionquery",
+      "docs": "This is used for checking writing permissions.",
+      "tags": [],
+      "methods": [],
+      "properties": [
+        {
+          "name": "sampleName",
+          "tags": [],
+          "docs": "",
+          "complexTypes": [],
+          "type": "string"
+        }
+      ]
+    },
+    {
+      "name": "MultipleEditionQuery",
+      "slug": "multipleeditionquery",
+      "docs": "This is used for checking writing permissions.",
+      "tags": [],
+      "methods": [],
+      "properties": [
+        {
+          "name": "sampleNames",
+          "tags": [],
+          "docs": "",
+          "complexTypes": [],
+          "type": "string[]"
+        }
+      ]
+    }
+  ],
+  "enums": [],
+  "typeAliases": [],
+  "pluginConfigs": []
+}
