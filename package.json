@@ -1,12 +1,14 @@
 {
   "name": "@deepspan/capacitor-health",
-  "version": "1.0.0",
-  "description": "DeepSpan Custom Capacitor HealthKit plugin",
+  "version": "2.0.0",
+  "description": "DeepSpan Capacitor Health plugin — Apple HealthKit (iOS) and Google Health Connect (Android)",
   "main": "dist/plugin.cjs.js",
   "module": "dist/esm/index.js",
   "types": "dist/esm/index.d.ts",
   "unpkg": "dist/plugin.js",
   "files": [
+    "android/src/main/",
+    "android/build.gradle",
     "dist/",
     "ios/Plugin/",
     "DeepspanCapacitorHealth.podspec"
@@ -25,10 +27,15 @@
     "plugin",
     "native",
     "apple",
-    "healthkit"  ],
+    "healthkit",
+    "google",
+    "health connect",
+    "android"
+  ],
   "scripts": {
-    "verify": "npm run verify:ios && npm run verify:web",
+    "verify": "npm run verify:ios && npm run verify:android && npm run verify:web",
     "verify:ios": "cd ios && pod install && xcodebuild -workspace Plugin.xcworkspace -scheme Plugin && cd ..",
+    "verify:android": "cd android && ./gradlew clean build test && cd ..",
     "verify:web": "npm run build",
     "lint": "npm run eslint && npm run prettier -- --check && npm run swiftlint -- lint",
     "fmt": "npm run eslint -- --fix && npm run prettier -- --write && npm run swiftlint -- --fix --format",
@@ -36,12 +43,13 @@
     "prettier": "prettier \"**/*.{css,html,ts,js,java}\"",
     "swiftlint": "node-swiftlint",
     "docgen": "docgen --api CapacitorHealthkitPlugin --output-readme README.md --output-json dist/docs.json",
-    "build": "npm run clean && npm run docgen && tsc && rollup -c rollup.config.js",
+    "build": "npm run clean && tsc && rollup -c rollup.config.js",
     "clean": "rimraf ./dist",
     "watch": "tsc --watch",
     "prepublishOnly": "npm run build"
   },
   "devDependencies": {
+    "@capacitor/android": "^7.0.0",
     "@capacitor/core": "^7.0.1",
     "@capacitor/ios": "^7.0.1",
     "@capacitor/docgen": "^0.2.0",
@@ -67,6 +75,9 @@
   "capacitor": {
     "ios": {
       "src": "ios"
+    },
+    "android": {
+      "src": "android"
     }
   }
 }
