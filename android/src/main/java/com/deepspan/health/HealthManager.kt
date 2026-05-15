@@ -261,24 +261,51 @@ class HealthManager {
         }
 
         if (sampleName == "sleepAnalysis") {
+            // iOS returns one HKCategorySample per stage segment (e.g., one "AsleepCore" record,
+            // one "AsleepDeep" record, etc.). The hypnogram-building code in OuraHealthKit /
+            // FitbitHealthKit / GarminHealthKit / WhoopHealthKit relies on this per-segment shape.
+            // We replicate it here by expanding each SleepSessionRecord's stage list into
+            // individual records. Sessions with no stage data (older devices) fall back to
+            // a single "Asleep" record for the whole session, matching iOS's generic asleep behavior.
             readRecords(client, SleepSessionRecord::class, startTime, endTime, limit) { r ->
-                val durationHours = Duration.between(r.startTime, r.endTime).toMinutes() / 60.0
-                val sleepState = if (r.stages.isNotEmpty()) {
-                    val dominant = r.stages.maxByOrNull { Duration.between(it.startTime, it.endTime).toMillis() }
-                    if (dominant != null) hkitSleepStateFromStage(dominant.stage) else "Asleep"
-                } else "Asleep"
-                val obj = JSObject().apply {
-                    put("uuid", r.metadata.id)
-                    put("startDate", formatter.format(r.startTime))
-                    put("endDate", formatter.format(r.endTime))
-                    put("duration", durationHours)
-                    put("sleepState", sleepState)
-                    put("source", r.metadata.dataOrigin.packageName)
-                    put("sourceBundleId", r.metadata.dataOrigin.packageName)
-                    put("timeZone", "+00:00")
-                    put("device", JSObject.NULL)
+                val packageName = r.metadata.dataOrigin.packageName
+                val sessionId   = r.metadata.id
+
+                if (r.stages.isNotEmpty()) {
+                    // One record per stage segment — mirrors iOS HKCategorySample granularity
+                    r.stages.forEach { stage ->
+                        val stageDurationHours = Duration.between(stage.startTime, stage.endTime).toMinutes() / 60.0
+                        val obj = JSObject().apply {
+                            // Suffix stage index so each uuid is unique within the session
+                            put("uuid", "${sessionId}_${stage.stage}_${stage.startTime.toEpochMilli()}")
+                            put("startDate", formatter.format(stage.startTime))
+                            put("endDate", formatter.format(stage.endTime))
+                            put("duration", stageDurationHours)
+                            put("sleepState", hkitSleepStateFromStage(stage.stage))
+                            put("source", packageName)
+                            put("sourceBundleId", packageName)
+                            put("timeZone", null)
+                            put("device", JSObject.NULL)
+                        }
+                        resultData.put(obj)
+                    }
+                } else {
+                    // No stage data — emit a single record for the whole session (generic "Asleep"),
+                    // matching what iOS returns for devices that don't provide stage detail.
+                    val durationHours = Duration.between(r.startTime, r.endTime).toMinutes() / 60.0
+                    val obj = JSObject().apply {
+                        put("uuid", sessionId)
+                        put("startDate", formatter.format(r.startTime))
+                        put("endDate", formatter.format(r.endTime))
+                        put("duration", durationHours)
+                        put("sleepState", "Asleep")
+                        put("source", packageName)
+                        put("sourceBundleId", packageName)
+                        put("timeZone", null)
+                        put("device", JSObject.NULL)
+                    }
+                    resultData.put(obj)
                 }
-                resultData.put(obj)
             }
             return JSObject().apply {
                 put("countReturn", resultData.length())
@@ -388,18 +415,18 @@ class HealthManager {
                 requireNotNull(systolic) { "Blood pressure requires a systolic value" }
                 requireNotNull(diastolic) { "Blood pressure requires a diastolic value" }
                 client.insertRecords(listOf(
-                    BloodPressureRecord(startTime, zoneOffset(startTime),
+                    BloodPressureRecord(startTime, zoneOffset(startTime), meta,
                         Pressure.millimetersOfMercury(systolic),
-                        Pressure.millimetersOfMercury(diastolic), meta)
+                        Pressure.millimetersOfMercury(diastolic))
                 ))
             }
             HealthDataType.BLOOD_GLUCOSE -> client.insertRecords(listOf(
-                BloodGlucoseRecord(startTime, zoneOffset(startTime),
-                    BloodGlucose.milligramsPerDeciliter(value), meta)
+                BloodGlucoseRecord(startTime, zoneOffset(startTime), meta,
+                    BloodGlucose.milligramsPerDeciliter(value))
             ))
             HealthDataType.BODY_TEMPERATURE -> client.insertRecords(listOf(
-                BodyTemperatureRecord(startTime, zoneOffset(startTime),
-                    Temperature.celsius(value), meta)
+                BodyTemperatureRecord(startTime, zoneOffset(startTime), meta,
+                    Temperature.celsius(value))
             ))
             HealthDataType.HEIGHT -> client.insertRecords(listOf(
                 HeightRecord(startTime, zoneOffset(startTime),
@@ -410,15 +437,15 @@ class HealthManager {
                     value, meta)
             ))
             HealthDataType.EXERCISE_TIME -> client.insertRecords(listOf(
-                ExerciseSessionRecord(startTime, zoneOffset(startTime), endTime, zoneOffset(endTime),
-                    ExerciseSessionRecord.EXERCISE_TYPE_OTHER_WORKOUT, meta)
+                ExerciseSessionRecord(startTime, zoneOffset(startTime), endTime, zoneOffset(endTime), meta,
+                    ExerciseSessionRecord.EXERCISE_TYPE_OTHER_WORKOUT)
             ))
             HealthDataType.BODY_FAT -> client.insertRecords(listOf(
                 BodyFatRecord(startTime, zoneOffset(startTime), Percentage(value), meta)
             ))
             HealthDataType.BASAL_BODY_TEMPERATURE -> client.insertRecords(listOf(
-                BasalBodyTemperatureRecord(startTime, zoneOffset(startTime),
-                    Temperature.celsius(value), meta)
+                BasalBodyTemperatureRecord(startTime, zoneOffset(startTime), meta,
+                    Temperature.celsius(value))
             ))
             HealthDataType.BASAL_CALORIES -> client.insertRecords(listOf(
                 BasalMetabolicRateRecord(startTime, zoneOffset(startTime),
