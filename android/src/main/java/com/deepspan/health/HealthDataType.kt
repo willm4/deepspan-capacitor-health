@@ -79,7 +79,12 @@ enum class HealthDataType(
                 "stairs" -> listOf(FLIGHTS_CLIMBED)
                 "duration", "exerciseTime" -> listOf(EXERCISE_TIME)
                 "activity" -> listOf(SLEEP)
-                "calories" -> listOf(CALORIES, BASAL_CALORIES)
+                // "calories" maps to active energy only, matching the HKit sample-name
+                // mapping below ("calories" -> CALORIES, "basalCalories" -> BASAL_CALORIES).
+                // Requesting BasalMetabolicRate here would force every consumer to declare
+                // READ_BASAL_METABOLIC_RATE in its manifest or the permission sheet would
+                // re-prompt forever; consumers that want basal energy request "basalCalories".
+                "calories" -> listOf(CALORIES)
                 "distance" -> listOf(DISTANCE, DISTANCE_CYCLING)
                 "bloodGlucose" -> listOf(BLOOD_GLUCOSE)
                 "weight" -> listOf(WEIGHT)
